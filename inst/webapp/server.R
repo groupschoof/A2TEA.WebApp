@@ -1075,8 +1075,22 @@ server <- function(input, output, session) {
     req(input$log2FC_layer == TRUE)
 
     sliderInput(inputId = "tea_log2FC_offset_choice",
-                label = "log2FC - Offset",
+                label = "log2FC offset",
                 value = 0.8,
+                min = 0,
+                step = 0.05,
+                max = 5
+    )
+  })
+  
+  output$tea_basemean_offset_options <- renderUI({
+    req(input$select_Hypothesis_server)
+    req(input$select_HOG_server)
+    req(input$baseMean_layer == TRUE)
+    
+    sliderInput(inputId = "tea_baseMean_offset_choice",
+                label = "basemn offset",
+                value = 0.1,
                 min = 0,
                 step = 0.05,
                 max = 5
@@ -1090,7 +1104,21 @@ server <- function(input, output, session) {
     req(input$log2FC_layer == TRUE)
 
     sliderInput(inputId = "tea_log2FC_pwidth_choice",
-                label = "log2FC - layer width",
+                label = "log2FC width",
+                value = 0.2,
+                min = 0.1,
+                step = 0.1,
+                max = 5
+    )
+  })
+  
+  output$tea_basemean_pwidth_options <- renderUI({
+    req(input$select_Hypothesis_server)
+    req(input$select_HOG_server)
+    req(input$baseMean_layer == TRUE)
+    
+    sliderInput(inputId = "tea_baseMean_pwidth_choice",
+                label = "basemn width",
                 value = 0.2,
                 min = 0.1,
                 step = 0.1,
@@ -1372,231 +1400,91 @@ server <- function(input, output, session) {
         pull(arr) %>% floor()
 
 
-      if (input$log2FC_layer == TRUE & input$tea_log2FC_add_sign_stars_choice == FALSE) {
-        req(input$log2FC_layer == TRUE)
-        req(input$tea_log2FC_add_sign_stars_choice == FALSE)
-        req(input$tea_log2FC_n_break_choice)
-        req(input$tea_log2FC_offset_choice)
-        req(input$tea_log2FC_pwidth_choice)
-        req(input$tea_log2FC_axis_text_choice)
-        req(input$tea_log2FC_vjust_choice)
-        req(input$tea_log2FC_linetype_choice)
+#       # new modularization of the plot. This is what geom_fruit is made for.
 
-        # this is the case where we don't add significance stars
-        # we need to add the geom_fruit layer for log2FoldChange
-        # and baseMean
-         p <- p +
-          new_scale_fill() +
-          geom_fruit_list(
-            geom_fruit(
-              data=tree_dge,
-              geom = geom_bar,
-              mapping = aes(
-                y=gene,
-                x=log2FoldChange
-              ),
-              orientation="y",
-              stat="identity",
-              fill="navy",
-              colour = "navy",
-              alpha=.7,
-              inherit.aes=FALSE,
-              offset = input$tea_log2FC_offset_choice,
-              pwidth = input$tea_log2FC_pwidth_choice,
-              axis.params =
-                list(
-                  axis = "x",
-                  text.size = !!input$tea_log2FC_axis_text_choice,
-                  # nbreak - variable or function accepted here?
-                  nbreak = !!input$tea_log2FC_n_break_choice, #input$nbreak_choice,
-                  line.size = 0.5,
-                  vjust = !!input$tea_log2FC_vjust_choice,
-                  line.color = "black",
-                  inherit.aes = FALSE,
-                ),
-              grid.params =
-                list(
-                  size = 0.5, #color = "navy"
-                  linetype = !!input$tea_log2FC_linetype_choice
-                )
-            ),
-            new_scale_fill(), # To initialize fill scale.
-            geom_fruit(
-            data = tree_dge,
-            geom = geom_bar,
-            mapping = aes(
-              y = gene,
-              x = baseMean
-            ),
-            orientation = "y",
-            stat = "identity",
-            fill = "darkgray",
-            colour = "darkgray",
-            alpha = .7,
-            inherit.aes = FALSE,
-            offset = input$tea_log2FC_offset_choice,
-            pwidth = input$tea_log2FC_pwidth_choice,
-            axis.params = list(
-              axis = "x",
-              text.size = !!input$tea_log2FC_axis_text_choice,
-              nbreak = !!input$tea_log2FC_n_break_choice,
-              line.size = 0.5,
-              vjust = !!input$tea_log2FC_vjust_choice,
-              line.color = "black",
-              inherit.aes = FALSE
-            ),
-            grid.params = list(
-              size = 0.5,
-              linetype = !!input$tea_log2FC_linetype_choice
-            )
-          )
-          ) +
-          new_scale_fill() # To initialize fill scale.
-
-
-        # i think this was doubled in the original code, I commented it out (caroue)
-      # } else if (input$log2FC_layer == TRUE & input$tea_log2FC_add_sign_stars_choice == FALSE) {
-      #   # this is the case where we don't add significance stars
-      #   req(input$log2FC_layer == TRUE)
-      #   req(input$tea_log2FC_add_sign_stars_choice == FALSE)
-      #   req(input$tea_log2FC_n_break_choice)
-      #   req(input$tea_log2FC_offset_choice)
-      #   req(input$tea_log2FC_pwidth_choice)
-      #   req(input$tea_log2FC_axis_text_choice)
-      #   req(input$tea_log2FC_vjust_choice)
-      #   req(input$tea_log2FC_linetype_choice)
-
-      #   p <- p +
-      #     new_scale_fill() +
-      #     geom_fruit(
-      #       data=tree_dge,
-      #       geom = geom_bar,
-      #       mapping = aes(
-      #         y=gene,
-      #         x=log2FoldChange
-      #       ),
-      #       orientation="y",
-      #       stat="identity",
-      #       fill="navy",
-      #       colour = "navy",
-      #       alpha=.7,
-      #       inherit.aes=FALSE,
-      #       offset = input$tea_log2FC_offset_choice,
-      #       pwidth = input$tea_log2FC_pwidth_choice,
-      #       axis.params =
-      #         list(
-      #           axis = "x",
-      #           text.size = !!input$tea_log2FC_axis_text_choice,
-      #           # nbreak - variable or function accepted here?
-      #           nbreak = !!input$tea_log2FC_n_break_choice, #input$nbreak_choice,
-      #           line.size = 0.5,
-      #           vjust = !!input$tea_log2FC_vjust_choice,
-      #           line.color = "black",
-      #           inherit.aes = FALSE,
-      #         ),
-      #       grid.params =
-      #         list(
-      #           size = 0.5, #color = "navy"
-      #           linetype = !!input$tea_log2FC_linetype_choice
-      #         )
-      #     )
-      }
-
-
-      #log2FC layer + significance stars
-      if (input$log2FC_layer == TRUE & input$tea_log2FC_add_sign_stars_choice == TRUE) {
-        req(input$log2FC_layer == TRUE)
-        req(input$tea_log2FC_add_sign_stars_choice == TRUE)
-        req(input$tea_log2FC_n_break_choice)
-        req(input$tea_log2FC_offset_choice)
-        req(input$tea_log2FC_pwidth_choice)
-        req(input$tea_log2FC_axis_text_choice)
-        req(input$tea_log2FC_vjust_choice)
-        req(input$tea_log2FC_linetype_choice)
-
-        p <- p +
-          new_scale_fill() +
-          geom_fruit_list(
-            geom_fruit(
-              data=tree_dge,
-              geom = geom_bar,
-              mapping = aes(
-                y=gene,
-                x=log2FoldChange
-              ),
-              orientation="y",
-              stat="identity",
-              fill="navy",
-              colour = "navy",
-              alpha=.8,
-              inherit.aes=FALSE,
-              offset = input$tea_log2FC_offset_choice,
-              pwidth = input$tea_log2FC_pwidth_choice,
-              axis.params =
-                list(
-                  axis = "x",
-                  title= "log2FC",
-                  text.size = !!input$tea_log2FC_axis_text_choice,
-                  # nbreak - variable or function accepted here?
-                  nbreak = !!input$tea_log2FC_n_break_choice, #input$nbreak_choice,
-                  line.size = 0.5,
-                  vjust = !!input$tea_log2FC_vjust_choice,
-                  line.color = "black",
-                  inherit.aes = FALSE,
-                ),
-              grid.params =
-                list(
-                  size = 0.5, #color = "navy"
-                  linetype = !!input$tea_log2FC_linetype_choice
-                )
-            ),
-            new_scale_fill(), # To initialize fill scale.
-            geom_fruit(
-            data = tree_dge,
-            geom = geom_bar,
-            mapping = aes(
-              y = gene,
-              x = baseMean
-            ),
-            orientation = "y",
-            stat = "identity",
-            fill = "darkgray",
-            colour = "darkgray",
-            alpha = .5,
-            inherit.aes = FALSE,
-            offset = 1.5*(input$tea_log2FC_offset_choice),
-            pwidth = input$tea_log2FC_pwidth_choice,
-            axis.params = list(
-              axis = "x",
-              title= "baseMean",
-              text.size = !!input$tea_log2FC_axis_text_choice,
-              text.angle = 90,
-              nbreak = !!input$tea_log2FC_n_break_choice,
-              line.size = 0.5,
-              vjust = !!input$tea_log2FC_vjust_choice,
-              line.color = "black",
-              inherit.aes = FALSE
-            ),
-            grid.params = list(
-              size = 0.5,
-              linetype = !!input$tea_log2FC_linetype_choice
-            )
+      # 1) Track whether log2FC has been added, to align stars on it
+      log2fc_added <- FALSE
+      
+      # 2) Add log2FC layer (if selected)
+      if (isTRUE(input$log2FC_layer)) {
+        p <- p + new_scale_fill() + geom_fruit(
+          data = tree_dge,
+          geom = geom_bar,
+          mapping = aes(y = gene, x = log2FoldChange),
+          orientation = "y",
+          stat = "identity",
+          fill = "navy",
+          colour = "navy",
+          alpha = .8,
+          inherit.aes = FALSE,
+          offset = input$tea_log2FC_offset_choice,
+          pwidth = input$tea_log2FC_pwidth_choice,
+          axis.params = list(
+            axis = "x",
+            title = "log2FC",
+            text.size = !!input$tea_log2FC_axis_text_choice,
+            nbreak = !!input$tea_log2FC_n_break_choice,
+            line.size = 0.5,
+            vjust = !!input$tea_log2FC_vjust_choice,
+            line.color = "black"
           ),
-            new_scale_fill(), # To initialize fill scale.
-            geom_fruit(
-              data=tree_dge_only_sig,
-              geom = geom_star,
-              mapping = aes(y=gene, x=log2FoldChange, fill=significant),
-              offset = .5 * input$tea_log2FC_offset_choice,
-              size = 4,
-              color = "orange",
-              starstroke = 1
-            )
-          ) +
-          new_scale_fill() # To initialize fill scale.
+          grid.params = list(
+            size = 0.5,
+            linetype = !!input$tea_log2FC_linetype_choice
+          )
+        )
+        log2fc_added <- TRUE
       }
-
-
+      
+      # 3) Add stars if log2FC exists and user wants them
+      if (log2fc_added && isTRUE(input$tea_log2FC_add_sign_stars_choice)) {
+        p <- p + new_scale_fill() + geom_fruit(
+          data = tree_dge_only_sig,
+          geom = geom_star,
+          mapping = aes(y = gene, x = log2FoldChange, fill = significant),
+          offset = 0,  # overlay perfectly
+          size = 4,
+          color = "orange",
+          starstroke = 1
+        )
+      }
+      
+      # 4) Add baseMean layer using user-defined offset
+      if (isTRUE(input$baseMean_layer)) {
+        p <- p + new_scale_fill() + geom_fruit(
+          data = tree_dge,
+          geom = geom_bar,
+          mapping = aes(y = gene, x = baseMean),
+          orientation = "y",
+          stat = "identity",
+          fill = "darkgray",
+          colour = "darkgray",
+          alpha = .5,
+          inherit.aes = FALSE,
+          offset = input$tea_baseMean_offset_choice,  # <-- NOW USER CONFIGURABLE
+          pwidth = input$tea_baseMean_pwidth_choice,
+          axis.params = list(
+            axis = "x",
+            title = "baseMean",
+            text.size = !!input$tea_log2FC_axis_text_choice,
+            text.angle = 90,
+            nbreak = !!input$tea_log2FC_n_break_choice,
+            line.size = 0.5,
+            vjust = !!input$tea_log2FC_vjust_choice,
+            line.color = "black"
+          ),
+          grid.params = list(
+            size = 0.5,
+            linetype = !!input$tea_log2FC_linetype_choice
+          )
+        )
+      }
+      
+      # 5) Reset scale
+      p <- p + new_scale_fill()
+      
+      
+      
       #adding a MSA layer
       if (input$msa_layer == TRUE) {
         req(input$msa_layer == TRUE)

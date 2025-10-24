@@ -608,10 +608,15 @@ body <- dashboardBody(
                                             label = "Mark significant DEGs",
                                             value = TRUE
                               ),
+                              checkboxInput("baseMean_layer", 
+                                            label= "Include baseMean layer",
+                                            value = FALSE)
                             ),
                             splitLayout(
                               uiOutput("tea_log2FC_offset_options"),
                               uiOutput("tea_log2FC_pwidth_options"),
+                              uiOutput("tea_basemean_offset_options"),
+                              uiOutput("tea_basemean_pwidth_options"),
                             ),
                             checkboxInput(inputId = "msa_layer",
                                           label = "Add MSA - only recommended for NON-circular views",
