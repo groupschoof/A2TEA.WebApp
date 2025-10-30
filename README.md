@@ -1,4 +1,4 @@
-This is a version of the A2TEA.WebApp which includes the baseMean expression values of the genes in the TEA_Analysis/Tree plots, so the user can immediately see, if the gene is strongly or nearly not expressed. Note: this is just a quick fix! It needs proper change of the code to separate the basemean plot from the log2FC plot.
+This is a version of the A2TEA.WebApp which includes the baseMean expression values of the genes in the TEA_Analysis/Tree plots, so the user can immediately see if the gene is strongly or nearly not expressed. Furthermore, the species' names are displayed along each protein in the tree. The species tree now includes a scale bar for the branch lengths.
 <!-- <img src="man/figures/logo.png" align="right" alt="" width="120" /> -->
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
