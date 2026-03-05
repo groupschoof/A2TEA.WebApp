@@ -1647,10 +1647,11 @@ server <- function(input, output, session) {
 
       msa_set_solo <- tidy_msa(msa_solo(), input$msa_solo_range_pos[1], input$msa_solo_range_pos[2])
 
-      msa_plot <- ggplot() +
-        geom_msa(data = msa_set_solo,
-                 color = input$msa_solo_color_scheme,
-                 seq_name = TRUE) +
+      msa_plot <- ggmsa(msa_solo(), 
+                        input$msa_solo_range_pos[1], 
+                        input$msa_solo_range_pos[2],
+                        color = input$msa_solo_color_scheme,
+                        seq_name = TRUE) +
         theme(
           panel.border = element_blank(),
           panel.background = element_blank(),
